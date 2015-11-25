@@ -1,0 +1,43 @@
+open Absyn
+
+%%
+
+%header (functor FolLrValsFun (structure Token : TOKEN
+			       structure Absyn : ABSYN ) : Fol_LRVALS)
+
+%term	NAME of string | VARIABLE of string | LPAREN | RPAREN | DOT | EOF | COMMA | IF | PARSEPROG | PARSEQUERY
+
+(* gform: goal formula
+   dform: definite clause *)
+
+%nonterm  BEGIN of tree | PROGRAM of tree | STATEMENT of tree | FACT of tree | RULE of tree | LITERAL of tree | TUPLE of tree | NTERM of tree | TERM of tree | HEAD of tree | BODY of tree
+
+%eop EOF
+%pos int
+%verbose
+%pure
+%name Fol
+
+%%
+		
+BEGIN               :PARSEPROG                                                 (Null)
+		    | PARSEPROG PROGRAM					       (Node("BEGIN",[PROGRAM]))
+		    | PARSEQUERY                                               (Null)
+		    | PARSEQUERY PROGRAM				       (Node("BEGIN",[PROGRAM]))
+PROGRAM             : STATEMENT                                                (Node("PROGRAM",[STATEMENT]))
+		    | STATEMENT PROGRAM					       (Node("PROGRAM",[STATEMENT,PROGRAM]))
+STATEMENT           : FACT DOT                                                 (Node("STATEMENT",[FACT]))
+                    | RULE DOT                                                 (Node("STATEMENT",[RULE]))
+FACT                : LITERAL                                                  (Node("FACT",[LITERAL]))
+RULE                : HEAD IF BODY                                             (Node("RULE",[HEAD,BODY]))
+HEAD                : LITERAL                                                  (Node("HEAD",[LITERAL]))
+BODY                : LITERAL                                                  (Node("BODY",[LITERAL]))
+                    | LITERAL COMMA BODY                                       (Node("BODY",[LITERAL,BODY]))
+LITERAL             : NAME                                                     (Node("LITERAL",[Node("NAME",[Leaf(NAME)])]))
+                    | NAME TUPLE                                               (Node("LITERAL",[Node("NAME",[Leaf(NAME)]),TUPLE]))
+TUPLE               : LPAREN NTERM RPAREN                                      (Node("TUPLE",[NTERM]))
+NTERM               : TERM                                                     (Node("NTERM",[TERM]))
+                    | TERM COMMA NTERM                                         (Node("NTERM",[TERM,NTERM]))
+TERM                : NAME                                                     (Node("TERM",[Node("NAME",[Leaf(NAME)])]))
+                    | VARIABLE                                                 (Node("TERM",[Node("VARIABLE",[Leaf(VARIABLE)])]))
+                    | NAME TUPLE	                                       (Node("TERM",[Node("NAME",[Leaf(NAME)]),TUPLE]))		

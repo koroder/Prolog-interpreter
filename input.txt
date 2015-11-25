@@ -1,0 +1,60 @@
+male(a).
+male(c).
+male(i).
+male(m).
+male(f).
+male(n).
+male(t).
+male(k).
+
+female(b).
+female(d).
+female(s).
+female(h).
+female(g).
+female(o).
+female(p).
+
+married(a,b).
+married(c,d).
+married(s,i).
+married(h,f).
+married(g,k).
+married(t,o).
+
+parent(a,i).
+parent(b,i).
+parent(a,h).
+parent(b,h).
+parent(c,f).
+parent(d,f).
+parent(c,g).
+parent(d,g).
+parent(s,o).
+parent(i,o).
+parent(h,m).
+parent(f,m).
+parent(g,n).
+parent(k,n).
+parent(t,p).
+parent(o,p).
+
+child(X,Y) :- parent(Y,X).
+
+edge(a,b).
+edge(b,c).
+edge (a,c).
+
+path(X,X).
+path(X,Y) :- edge(X,Z),path(Z,Y).
+
+son(X,A) :- child(X,A),male(X).
+daughter(X,A) :- child(X,A),female(X).
+ancestor(X,X).
+ancestor(X,Y) :- parent(X,A),ancestor(A,Y).
+father(X,Y) :- parent(X,Y),male(X).
+mother(X,Y) :- parent(X,Y),female(X).
+nana(A,C) :- father(A,B),mother(B,C).
+dada(A,C) :- father(A,B),father(B,C).
+nani(A,C) :- mother(A,B),mother(B,C).
+dadi(A,C) :- father(B,C),mother(A,B).

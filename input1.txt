@@ -1,0 +1,6 @@
+daughter(X1,c).
+son(i,X1).
+dadi(X1,o).
+mother(X1,o).
+
+mother(a,X). (fail)
